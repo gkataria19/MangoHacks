@@ -1,0 +1,1 @@
+# MangoHacks Visual Reccognition api
