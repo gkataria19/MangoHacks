@@ -232,7 +232,7 @@ public class MainActivity extends AppCompatActivity implements SurfaceHolder.Cal
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        convertButton= (Button) findViewById(R.id.button);
+        //convertButton= (Button) findViewById(R.id.button);
 //        inputText= (EditText) findViewById(R.id.editText);
 //        textView=(TextView) findViewById(R.id.textView2);
         textureView = (TextureView)findViewById(R.id.texture);
@@ -249,8 +249,7 @@ public class MainActivity extends AppCompatActivity implements SurfaceHolder.Cal
 //            }
 //        });
 
-        WatsonTask task=new WatsonTask();
-        task.execute(new String[]{});
+
     }
 
     TextureView.SurfaceTextureListener textureListener = new TextureView.SurfaceTextureListener() {
@@ -475,6 +474,8 @@ public class MainActivity extends AppCompatActivity implements SurfaceHolder.Cal
                     updatePreview();
                     takePicture();
                     try {
+                        WatsonTask task=new WatsonTask();
+                        task.execute(new String[]{});
                         TimeUnit.SECONDS.sleep(5);
                     }
                     catch(Exception e) {
