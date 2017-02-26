@@ -24,6 +24,7 @@ import com.ibm.watson.developer_cloud.visual_recognition.v3.model.ClassifyImages
 import com.ibm.watson.developer_cloud.visual_recognition.v3.model.VisualClassification;
 //import com.ibm.watson.developer_cloud.android.library.audio.CameraHelper;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -72,10 +73,54 @@ public class MainActivity extends AppCompatActivity {
 
         @Override
         protected String doInBackground(String... texttoSpeak) {
-            VisualRecognition service = new VisualRecognition(VisualRecognition.VERSION_DATE_2016_05_20);
-            service.setApiKey("9de1fa73a80de0509a16fddd22573505dca53a36");
+            //VisualRecognition service = new VisualRecognition(VisualRecognition.VERSION_DATE_2016_05_20);
+            //service.setApiKey("9de1fa73a80de0509a16fddd22573505dca53a36");
 
+//           +
 
+//          System.out.println("Classify an image");
+//            Drawable resImg = MainActivity.this.getApplicationContext().getResources().getDrawable(R.drawable.tiger);
+//            InputStream ins = getResources().openRawResource(R.raw.tiger);
+//            BufferedReader br = new BufferedReader(new InputStreamReader(ins));
+//            StringBuffer sb = new StringBuffer();
+//            String line;
+//            try {
+//                while((line = br.readLine()) != null){
+//                    sb.append(line);
+//                }
+//            } catch (IOException e) {
+//                e.printStackTrace();
+//            }
+//            if(new File("res/raw/tiger.png").exists()) {
+//                System.out.println("tiger file exist");
+//            }
+//            try {
+//                JSONObject obj = new JSONObject("{}");
+//            } catch (JSONException e) {
+//                e.printStackTrace();
+//            }
+//            File f = new File(sb.toString());
+//            ClassifyImagesOptions.Builder options = new ClassifyImagesOptions.Builder()
+//                    //.images(new File("/DCIM/Camera/20170218_004124.jpg"))
+//                    .images(new File("res/raw/tiger.png"));
+//             VisualClassification result = service.classify(options.build()).execute();
+//            System.out.println(result);
+//            SpeechToText service = new SpeechToText();
+//           String username = "018fa0dc-8935-424e-ae2f-612e03dee71d-bluemix";
+//            String password ="93423400bb21081c0c45cb459109d5ba7193635bc1339f88f955a0b8ef2fde7d";
+//            service.setUsernameAndPassword(username, password);
+//            service.setEndPoint("https://stream.watsonplatform.net/speech-to-text/api");
+//               File audio = new File("DCIM/Camera");
+//               System.out.print(audio.toString());
+//            System.out.print(audio.toString());
+//            System.out.print(audio.toString());
+//            System.out.print(audio.toString());
+
+//
+//            SpeechResults transcript = service.recognize(audio).execute();
+//            System.out.println(transcript);
+             // public List<ClarifaiOutput<Concept>> test() {//doInBackground(Void... params) {
+            System.out.println("testing ");
                 final ClarifaiClient client = new ClarifaiBuilder("5CYU-aQvcpz1g52Wk22W_cegQMpHLrumGxZ5Jogr", "wqMmIYY4xi1gMygi3FOOd4Hy66oyTCDv4EHpxe4d").buildSync();
                 final List<ClarifaiOutput<Concept>> predictionResults =
                         client.getDefaultModels().generalModel() // You can also do Clarifai.getModelByID("id") to get custom models
@@ -86,10 +131,14 @@ public class MainActivity extends AppCompatActivity {
                                         ClarifaiInput.forImage(ClarifaiImage.of("https://samples.clarifai.com/metro-north.jpg"))
                                 )
                                 .executeSync().get();
-            for(ClarifaiOutput<Concept> conceptClarifaiOutput: predictionResults) {
-                System.out.print(conceptClarifaiOutput.data());
-//
+
+            for(ClarifaiOutput<Concept> c : predictionResults){
+                System.out.println(c.data().get(1).name().toString());
             }
+
+
+
+
 //
               //  return predictionResults;
             //}
