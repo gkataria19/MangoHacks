@@ -1,5 +1,50 @@
 package com.google.myapplication;
 
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.drawable.Drawable;
+import android.os.AsyncTask;
+import android.support.v7.app.AppCompatActivity;
+import android.os.Bundle;
+import android.view.View;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.ImageButton;
+import android.widget.ImageView;
+import android.widget.TextView;
+
+import com.ibm.watson.developer_cloud.android.library.audio.StreamPlayer;
+import com.ibm.watson.developer_cloud.http.HttpMediaType;
+import com.ibm.watson.developer_cloud.speech_to_text.v1.SpeechToText;
+import com.ibm.watson.developer_cloud.text_to_speech.v1.TextToSpeech;
+import com.ibm.watson.developer_cloud.text_to_speech.v1.model.Voice;
+import com.ibm.watson.developer_cloud.speech_to_text.v1.model.SpeechResults;
+import com.ibm.watson.developer_cloud.visual_recognition.v3.VisualRecognition;
+import com.ibm.watson.developer_cloud.visual_recognition.v3.model.ClassifyImagesOptions;
+import com.ibm.watson.developer_cloud.visual_recognition.v3.model.VisualClassification;
+//import com.ibm.watson.developer_cloud.android.library.audio.CameraHelper;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.util.ArrayList;
+import java.util.List;
+
+import clarifai2.api.ClarifaiBuilder;
+import clarifai2.api.ClarifaiClient;
+import clarifai2.dto.input.ClarifaiInput;
+import clarifai2.dto.input.image.ClarifaiImage;
+import clarifai2.dto.model.output.ClarifaiOutput;
+import clarifai2.dto.prediction.Concept;
+
+
+
 
 import android.Manifest;
 import android.annotation.TargetApi;
@@ -54,10 +99,15 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
-import static android.app.PendingIntent.getActivity;
 
 @TargetApi(Build.VERSION_CODES.LOLLIPOP)
 public class MainActivity extends AppCompatActivity implements SurfaceHolder.Callback{
+
+    private Button convertButton;
+    private EditText inputText;
+    private TextView textView;
+    private ImageView image1;
+
     private static final String TAG = "AndroidCameraApi";
     private Button takePictureButton;
     private TextureView textureView;
@@ -84,55 +134,124 @@ public class MainActivity extends AppCompatActivity implements SurfaceHolder.Cal
     private HandlerThread mBackgroundThread;
     private int counter = 0;
 
+    StreamPlayer streamPlayer;
+
+
+    private TextToSpeech initTextToSpeechService(){
+        TextToSpeech service = new TextToSpeech();
+        String username = "42e9bf50-41ab-4711-b85b-a87ba1b6ad8f";
+        String password = "SUKtaggrTwcO";
+        service.setUsernameAndPassword(username, password);
+        return service;
+    }
+
+    @Override
+    public void surfaceCreated(SurfaceHolder surfaceHolder) {
+
+    }
+
+    @Override
+    public void surfaceChanged(SurfaceHolder surfaceHolder, int i, int i1, int i2) {
+
+    }
+
+    @Override
+    public void surfaceDestroyed(SurfaceHolder surfaceHolder) {
+
+    }
+
+    /*  Watson service credentials
+
+         "url": "https://stream.watsonplatform.net/text-to-speech/api",
+        "username": "42e9bf50-41ab-4711-b85b-a87ba1b6ad8f",
+        "password": "SUKtaggrTwcO"
+
+    */
+
+    private class WatsonTask extends AsyncTask<String,Void,String> {
+
+        ArrayList<String> listOfNames=new ArrayList<String>();
+        @Override
+        protected String doInBackground(String... texttoSpeak) {
+
+            System.out.println("testing ");
+            final ClarifaiClient client = new ClarifaiBuilder("5CYU-aQvcpz1g52Wk22W_cegQMpHLrumGxZ5Jogr", "wqMmIYY4xi1gMygi3FOOd4Hy66oyTCDv4EHpxe4d").buildSync();
+            final List<ClarifaiOutput<Concept>> predictionResults =
+                    client.getDefaultModels().generalModel() // You can also do Clarifai.getModelByID("id") to get custom models
+                            .predict()
+                            .withInputs(
+
+
+                                    ClarifaiInput.forImage(ClarifaiImage.of("https://fsmedia.imgix.net/a2/51/c6/b0/7b6a/47f9/bbba/d4ec202a71c8/will-nightwing-replace-ben-afflecks-batman-in-the-dceu.jpeg?rect=0,0,2000,1000&w=1200&fm=png&w=1200&fm=png&q=75"))
+                            )
+                            .executeSync().get();
+
+            for(ClarifaiOutput<Concept> c : predictionResults){
+
+                List<Concept> test=c.data();
+                for(int i=0;i<test.size();i++){
+                    System.out.println(test.get(i).name().toString());
+                    listOfNames.add(test.get(i).name().toString());
+
+                }
+            }
+
+
+
+
+//
+            //  return predictionResults;
+            //}
+
+//            runOnUiThread(new Runnable() {
+//                @Override
+//
+//                public void run() {
+//                    textView.setText("running the Watson thread");
+//                }
+//            });
+
+            // WatsonTask obj=new WatsonTask();
+
+
+            TextToSpeech textToSpeech = initTextToSpeechService();
+            streamPlayer = new StreamPlayer();
+            for(int j=0;j<listOfNames.size();j++){
+                streamPlayer.playStream(textToSpeech.synthesize(listOfNames.get(j),Voice.EN_MICHAEL).execute());}
+
+            return "hello";//predictionResults.toString();
+        }
+//        @Override
+//        protected void onPostExecute(String result){
+//
+//            textView.setText(("TTS status: "+result));
+//        }
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
+        convertButton= (Button) findViewById(R.id.button);
+//        inputText= (EditText) findViewById(R.id.editText);
+//        textView=(TextView) findViewById(R.id.textView2);
         textureView = (TextureView)findViewById(R.id.texture);
         assert textureView != null;
         textureView.setSurfaceTextureListener(textureListener);
-        takePictureButton = (Button) findViewById(R.id.takepicture);
-        assert takePictureButton != null;
-        takePictureButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
 
-            }
-        });
+//        convertButton.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//                    public void onClick(View v){
+//                      // System.out.println("the text to speech is: "+inputText.getText());
+//                      // textView.setText("TTY: "+inputText.getText());
+//
+//
+//            }
+//        });
 
-        //while(x==0) ;
-
-
-
-         /*   new Handler(Looper.getMainLooper()).postDelayed(new Runnable(){
-                @Override
-                public void run() {}},5000);
-
-                counter++;
-
-
-        }*/
-
-        //setUpCameraOutputs();
-
-
+        WatsonTask task=new WatsonTask();
+        task.execute(new String[]{});
     }
-
-    /*@Override
-    protected void onStart() {
-        while(counter<10) {
-            try {
-                Thread.sleep(1000);
-                takePictureButton.callOnClick();
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-
-        }
-    }*/
-
 
     TextureView.SurfaceTextureListener textureListener = new TextureView.SurfaceTextureListener() {
         @Override
@@ -305,7 +424,6 @@ public class MainActivity extends AppCompatActivity implements SurfaceHolder.Cal
                     catch (Exception e) {
                         e.printStackTrace();
                     }
-
                 }
                 @Override
                 public void onConfigureFailed(CameraCaptureSession session) {
@@ -327,9 +445,6 @@ public class MainActivity extends AppCompatActivity implements SurfaceHolder.Cal
 
             System.out.println(String.valueOf(yourMaxFocus)+" x:y "+String.valueOf(yourMinFocus));
             Toast.makeText(MainActivity.this, String.valueOf(yourMaxFocus)+" x:y "+String.valueOf(yourMinFocus), Toast.LENGTH_LONG).show();
-
-
-
 
         }
         catch(Exception e) {
@@ -445,42 +560,4 @@ public class MainActivity extends AppCompatActivity implements SurfaceHolder.Cal
         super.onPause();
     }
 
-    @Override
-    public void surfaceCreated(SurfaceHolder holder) {
-
-    }
-
-    @Override
-    public void surfaceChanged(SurfaceHolder holder, int format, int width, int height) {
-
-    }
-
-    @Override
-    public void surfaceDestroyed(SurfaceHolder holder) {
-
-    }
-
-   /* public void delay(int seconds){
-
-
-        final int milliseconds = seconds * 1000;
-        ExecutorService es = Executors.newCachedThreadPool();
-
-        runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                final Handler handler = new Handler();
-                handler.postDelayed(new Runnable() {
-                    @Override
-                    public void run() {
-                        System.out.println("XXX");                 //add your code here
-                    }
-                }, milliseconds);
-            }
-        });
-
-    }*/
 }
-
-
-
