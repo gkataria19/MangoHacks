@@ -7,17 +7,36 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.ibm.watson.developer_cloud.android.library.audio.StreamPlayer;
+import com.ibm.watson.developer_cloud.http.HttpMediaType;
+import com.ibm.watson.developer_cloud.speech_to_text.v1.SpeechToText;
 import com.ibm.watson.developer_cloud.text_to_speech.v1.TextToSpeech;
 import com.ibm.watson.developer_cloud.text_to_speech.v1.model.Voice;
+import com.ibm.watson.developer_cloud.speech_to_text.v1.model.SpeechResults;
+import com.ibm.watson.developer_cloud.visual_recognition.v3.VisualRecognition;
+import com.ibm.watson.developer_cloud.visual_recognition.v3.model.ClassifyImagesOptions;
+import com.ibm.watson.developer_cloud.visual_recognition.v3.model.VisualClassification;
+//import com.ibm.watson.developer_cloud.android.library.audio.CameraHelper;
+
+import java.io.File;
+import java.util.List;
+
+import clarifai2.api.ClarifaiBuilder;
+import clarifai2.api.ClarifaiClient;
+import clarifai2.dto.input.ClarifaiInput;
+import clarifai2.dto.input.image.ClarifaiImage;
+import clarifai2.dto.model.output.ClarifaiOutput;
+import clarifai2.dto.prediction.Concept;
 
 public class MainActivity extends AppCompatActivity {
 
     private Button convertButton;
     private EditText inputText;
     private TextView textView;
+    private ImageView image1;
 
     StreamPlayer streamPlayer;
 
@@ -42,17 +61,56 @@ public class MainActivity extends AppCompatActivity {
 
         @Override
         protected String doInBackground(String... texttoSpeak) {
+            VisualRecognition service = new VisualRecognition(VisualRecognition.VERSION_DATE_2016_05_20);
+            service.setApiKey("9de1fa73a80de0509a16fddd22573505dca53a36");
+
+//           +
+          System.out.println("Classify an image");
+            ClassifyImagesOptions options = new ClassifyImagesOptions.Builder()
+                    .images(new File("/DCIM/Camera/20170218_004124.jpg"))
+                    .build();
+            VisualClassification result = service.classify(options).execute();
+            System.out.println(result);
+//            SpeechToText service = new SpeechToText();
+//           String username = "018fa0dc-8935-424e-ae2f-612e03dee71d-bluemix";
+//            String password ="93423400bb21081c0c45cb459109d5ba7193635bc1339f88f955a0b8ef2fde7d";
+//            service.setUsernameAndPassword(username, password);
+//            service.setEndPoint("https://stream.watsonplatform.net/speech-to-text/api");
+//            File audio = new File("src/test/resources/sample1.wav");
+//
+//            SpeechResults transcript = service.recognize(audio).execute();
+//            System.out.println(transcript);
+//              public List<ClarifaiOutput<Concept>> test(){//doInBackground(Void... params) {
+            final ClarifaiClient client = new ClarifaiBuilder("5CYU-aQvcpz1g52Wk22W_cegQMpHLrumGxZ5Jogr", "wqMmIYY4xi1gMygi3FOOd4Hy66oyTCDv4EHpxe4d").buildSync();
+            final List<ClarifaiOutput<Concept>> predictionResults =
+                    client.getDefaultModels().generalModel() // You can also do Clarifai.getModelByID("id") to get custom models
+                            .predict()
+                            .withInputs(
+                                    ClarifaiInput.forImage(ClarifaiImage.of("https://samples.clarifai.com/metro-north.jpg"))
+                            )
+                            .executeSync().get();
+
+           // return  predictionResults;
+
+
+
+
+
+
             runOnUiThread(new Runnable() {
                 @Override
+
                 public void run() {
                     textView.setText("running the Watson thread");
                 }
             });
 
+
             TextToSpeech textToSpeech = initTextToSpeechService();
             streamPlayer = new StreamPlayer();
             streamPlayer.playStream(textToSpeech.synthesize(String.valueOf(inputText.getText()),Voice.EN_MICHAEL).execute());
-            return "text to speech done";
+
+            return "helkeode";//predictionResults.toString();
         }
         @Override
         protected void onPostExecute(String result){
@@ -64,17 +122,16 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
-
         convertButton= (Button) findViewById(R.id.button);
         inputText= (EditText) findViewById(R.id.editText);
         textView=(TextView) findViewById(R.id.textView2);
 
+
         convertButton.setOnClickListener(new View.OnClickListener() {
             @Override
                     public void onClick(View v){
-                        System.out.println("the text to speech is: "+inputText.getText());
-                        textView.setText("TTY: "+inputText.getText());
+                      // System.out.println("the text to speech is: "+inputText.getText());
+                       textView.setText("TTY: "+inputText.getText());
 
                     WatsonTask task=new WatsonTask();
                     task.execute(new String[]{});
