@@ -1,4 +1,4 @@
-package com.google.myapplication;
+package soya.com.firebaseblind;
 
 import org.junit.Test;
 
