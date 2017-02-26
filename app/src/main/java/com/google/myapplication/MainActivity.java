@@ -71,6 +71,7 @@ public class MainActivity extends AppCompatActivity {
 
     private class WatsonTask extends AsyncTask<String,Void,String> {
 
+        ArrayList<String> listOfNames=new ArrayList<String>();
         @Override
         protected String doInBackground(String... texttoSpeak) {
             //VisualRecognition service = new VisualRecognition(VisualRecognition.VERSION_DATE_2016_05_20);
@@ -128,12 +129,18 @@ public class MainActivity extends AppCompatActivity {
                                 .withInputs(
 
 
-                                        ClarifaiInput.forImage(ClarifaiImage.of("https://samples.clarifai.com/metro-north.jpg"))
+                                        ClarifaiInput.forImage(ClarifaiImage.of("https://fsmedia.imgix.net/a2/51/c6/b0/7b6a/47f9/bbba/d4ec202a71c8/will-nightwing-replace-ben-afflecks-batman-in-the-dceu.jpeg?rect=0,0,2000,1000&w=1200&fm=png&w=1200&fm=png&q=75"))
                                 )
                                 .executeSync().get();
 
             for(ClarifaiOutput<Concept> c : predictionResults){
-                System.out.println(c.data().get(1).name().toString());
+
+                List<Concept> test=c.data();
+                for(int i=0;i<test.size();i++){
+                    System.out.println(test.get(i).name().toString());
+                    listOfNames.add(test.get(i).name().toString());
+
+                }
             }
 
 
@@ -142,12 +149,7 @@ public class MainActivity extends AppCompatActivity {
 //
               //  return predictionResults;
             //}
-//
-//
-//
-//
-//
-//
+
 //            runOnUiThread(new Runnable() {
 //                @Override
 //
@@ -155,18 +157,20 @@ public class MainActivity extends AppCompatActivity {
 //                    textView.setText("running the Watson thread");
 //                }
 //            });
-//
-//
-//            TextToSpeech textToSpeech = initTextToSpeechService();
-//            streamPlayer = new StreamPlayer();
-//            streamPlayer.playStream(textToSpeech.synthesize(String.valueOf(inputText.getText()),Voice.EN_MICHAEL).execute());
 
-            return "helkeode";//predictionResults.toString();
+           // WatsonTask obj=new WatsonTask();
+            TextToSpeech textToSpeech = initTextToSpeechService();
+            streamPlayer = new StreamPlayer();
+            for(int j=0;j<listOfNames.size();j++){
+            streamPlayer.playStream(textToSpeech.synthesize(listOfNames.get(j),Voice.EN_MICHAEL).execute());}
+
+            return "hello";//predictionResults.toString();
         }
-        @Override
-        protected void onPostExecute(String result){
-            textView.setText(("TTS status: "+result));
-        }
+//        @Override
+//        protected void onPostExecute(String result){
+//
+//            textView.setText(("TTS status: "+result));
+//        }
     }
 
     @Override
@@ -174,15 +178,15 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         convertButton= (Button) findViewById(R.id.button);
-        inputText= (EditText) findViewById(R.id.editText);
-        textView=(TextView) findViewById(R.id.textView2);
+//        inputText= (EditText) findViewById(R.id.editText);
+//        textView=(TextView) findViewById(R.id.textView2);
 
 
         convertButton.setOnClickListener(new View.OnClickListener() {
             @Override
                     public void onClick(View v){
                       // System.out.println("the text to speech is: "+inputText.getText());
-                       textView.setText("TTY: "+inputText.getText());
+                      // textView.setText("TTY: "+inputText.getText());
 
                     WatsonTask task=new WatsonTask();
                     task.execute(new String[]{});
