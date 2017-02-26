@@ -1,0 +1,42 @@
+{
+  "project_info": {
+    "project_number": "349319862780",
+    "firebase_url": "https://blindapp-c2794.firebaseio.com",
+    "project_id": "blindapp-c2794",
+    "storage_bucket": "blindapp-c2794.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:349319862780:android:5f6ae9b1866e1644",
+        "android_client_info": {
+          "package_name": "soya.com.firebaseblind"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "349319862780-mjjo7b5k2jdoahesakoq2ndp4lfe5ogv.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyC2arK3IRuKJIt8N0kCSRT9tSm8YDBzvtQ"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 1,
+          "other_platform_oauth_client": []
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

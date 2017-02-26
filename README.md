@@ -1,1 +1,0 @@
-# MangoHacks - SoundVision
